@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Target, Trophy, Clock, Star } from "lucide-react";
+import { BookOpen, Target, Trophy, Clock, Star, Home, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   lessonId: string;
@@ -15,7 +16,7 @@ type Props = {
   onNavigateToQuestion: (index: number) => void;
 };
 
-export const LessonSidebar = ({
+export const ChallengeSidebar = ({
   lessonId,
   currentQuestion,
   totalQuestions,
@@ -23,23 +24,24 @@ export const LessonSidebar = ({
   hearts,
   onNavigateToQuestion,
 }: Props) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const router = useRouter();
 
   const questions = Array.from({ length: totalQuestions }, (_, i) => i + 1);
 
   return (
-    <div className={`fixed right-0 top-0 h-full bg-white border-l border-gray-200 transition-all duration-300 z-50 ${
+    <div className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 transition-all duration-300 z-50 ${
       isExpanded ? 'w-80' : 'w-16'
     }`}>
       {/* Toggle Button */}
-      <div className="absolute -left-3 top-1/2 transform -translate-y-1/2">
+      <div className="absolute -right-3 top-1/2 transform -translate-y-1/2">
         <Button
           variant="secondaryOutline"
           size="sm"
           className="rounded-full w-6 h-6 p-0 bg-white border-2 border-gray-300 hover:bg-gray-50"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          {isExpanded ? '→' : '←'}
+          {isExpanded ? '←' : '→'}
         </Button>
       </div>
 
@@ -47,6 +49,19 @@ export const LessonSidebar = ({
       <div className="h-full p-4 overflow-y-auto">
         {isExpanded ? (
           <div className="space-y-6">
+            {/* Back to Learn Button */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/learn")}
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Learn
+              </Button>
+            </div>
+
             {/* Lesson Info */}
             <div className="text-center">
               <h3 className="text-lg font-bold text-gray-800 mb-2">
@@ -142,6 +157,31 @@ export const LessonSidebar = ({
                 Review
               </Button>
             </div>
+
+            {/* Navigation Menu */}
+            <div className="space-y-2 pt-4 border-t border-gray-200">
+              <h4 className="font-semibold text-gray-800 text-sm">Navigation</h4>
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => router.push("/learn")}
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Learn
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => router.push("/courses")}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Courses
+                </Button>
+              </div>
+            </div>
           </div>
         ) : (
           /* Collapsed State Icons */
@@ -154,6 +194,9 @@ export const LessonSidebar = ({
             </div>
             <div className="flex flex-col items-center">
               <Trophy className="w-6 h-6 text-gray-600" />
+            </div>
+            <div className="flex flex-col items-center pt-4 border-t border-gray-200">
+              <Home className="w-6 h-6 text-gray-600" />
             </div>
           </div>
         )}

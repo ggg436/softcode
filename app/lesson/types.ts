@@ -1,5 +1,5 @@
 // First, let's create types.ts in the app/lesson directory to hold our types
-type Challenge = {
+export type Challenge = {
   id: string;
   lessonId: string;
   type: string;
@@ -8,14 +8,14 @@ type Challenge = {
   challengeOptions: ChallengeOption[];
 };
 
-type ChallengeOption = {
+export type ChallengeOption = {
   id: string;
   challengeId: string;
   text: string;
   correct: boolean;
 };
 
-type Subscription = {
+export type Subscription = {
   id: string;
   userId: string;
   stripeCustomerId?: string;

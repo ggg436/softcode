@@ -35,8 +35,7 @@ const QuestsPage = async () => {
           activeCourse={{
             id: userProgress.activeCourseId,
             title: "Spanish",
-            imageSrc: "/es.svg",
-            units: []
+            imageSrc: "/es.svg"
           }}
           hearts={userProgress.hearts}
           points={userProgress.points}

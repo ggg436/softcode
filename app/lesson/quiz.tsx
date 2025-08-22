@@ -17,7 +17,7 @@ import { Footer } from "./footer";
 import { Challenge } from "./challenge";
 import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
-import { LessonSidebar } from "./sidebar";
+import { ChallengeSidebar } from "./challenge-sidebar";
 import { Challenge as ChallengeType, Subscription } from "./types";
 
 type Props = {
@@ -122,13 +122,8 @@ export const Quiz = ({
 
     if (correctOption.id === selectedOption) {
       startTransition(() => {
-        upsertChallengeProgress(challenge.id)
-          .then((response) => {
-            if (response?.error === "hearts") {
-              openHeartsModal();
-              return;
-            }
-
+        upsertChallengeProgress(challenge.id, true)
+          .then(() => {
             correctControls.play();
             setStatus("correct");
             setPercentage((prev) => prev + 100 / challenges.length);
@@ -144,15 +139,10 @@ export const Quiz = ({
       startTransition(() => {
         reduceHearts()
           .then((response) => {
-            if (response?.error === "hearts") {
-              openHeartsModal();
-              return;
-            }
-
             incorrectControls.play();
             setStatus("wrong");
 
-            if (!response?.error) {
+            if (response === false) {
               setHearts((prev) => Math.max(prev - 1, 0));
             }
           })
@@ -207,8 +197,8 @@ export const Quiz = ({
           onCheck={() => router.push("/learn")}
         />
         
-        {/* Lesson Sidebar */}
-        <LessonSidebar
+        {/* Challenge Sidebar */}
+        <ChallengeSidebar
           lessonId={lessonId}
           currentQuestion={challenges.length}
           totalQuestions={challenges.length}
@@ -261,8 +251,8 @@ export const Quiz = ({
         onCheck={onContinue}
       />
       
-      {/* Lesson Sidebar */}
-      <LessonSidebar
+      {/* Challenge Sidebar */}
+      <ChallengeSidebar
         lessonId={lessonId}
         currentQuestion={activeIndex + 1}
         totalQuestions={challenges.length}

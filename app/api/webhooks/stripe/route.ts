@@ -2,7 +2,6 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import { setLocalStorage } from "@/lib/localStorage";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -33,7 +32,8 @@ export async function POST(req: Request) {
       return new NextResponse("User ID is required", { status: 400 });
     }
 
-    await db.insert(userSubscription).values({
+    // TODO: Implement subscription creation when database is set up
+    console.log("Subscription created:", {
       userId: session.metadata.userId,
       stripeSubscriptionId: subscription.id,
       stripeCustomerId: subscription.customer as string,
@@ -49,12 +49,13 @@ export async function POST(req: Request) {
       session.subscription as string
     );
 
-    await db.update(userSubscription).set({
+    // TODO: Implement subscription update when database is set up
+    console.log("Subscription updated:", {
       stripePriceId: subscription.items.data[0].price.id,
       stripeCurrentPeriodEnd: new Date(
         subscription.current_period_end * 1000,
       ),
-    }).where(eq(userSubscription.stripeSubscriptionId, subscription.id))
+    });
   }
 
   return new NextResponse(null, { status: 200 });

@@ -71,7 +71,7 @@ const LearnPage = async () => {
               <Unit
                 id={unit.id}
                 title={unit.title}
-                description={unit.description}
+                description={`Complete ${unit.lessons.length} lessons to master ${unit.title}`}
                 lessons={unit.lessons}
                 order={unit.order}
                 activeLesson={unit.lessons.find(l => !l.completed) && {

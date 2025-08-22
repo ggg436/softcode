@@ -6,7 +6,7 @@ type Props = {
   id: string;
   order: number;
   title: string;
-  description?: string;
+  description: string;
   lessons: Lesson[];
   activeLesson?: Lesson & {
     unit: UnitType;

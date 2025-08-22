@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import "react-circular-progressbar/dist/styles.css";
 
 type Props = {
-  id: number;
+  id: string;
   index: number;
   totalCount: number;
   locked?: boolean;
