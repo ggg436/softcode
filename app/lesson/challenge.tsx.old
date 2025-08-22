@@ -1,22 +1,15 @@
 import { cn } from "@/lib/utils";
+import { challengeOptions, challenges } from "@/db/schema";
 
 import { Card } from "./card";
 
-type ChallengeOption = {
-  id: string;
-  text: string;
-  correct: boolean;
-  imageSrc?: string | null;
-  audioSrc?: string | null;
-};
-
 type Props = {
-  options: ChallengeOption[];
-  onSelect: (id: string) => void;
+  options: typeof challengeOptions.$inferSelect[];
+  onSelect: (id: number) => void;
   status: "correct" | "wrong" | "none";
-  selectedOption?: string | null;
+  selectedOption?: number;
   disabled?: boolean;
-  type: "ASSIST" | "SELECT";
+  type: typeof challenges.$inferSelect["type"];
 };
 
 export const Challenge = ({
@@ -36,14 +29,14 @@ export const Challenge = ({
       {options.map((option, i) => (
         <Card
           key={option.id}
-          id={i}
+          id={option.id}
           text={option.text}
-          imageSrc={option.imageSrc ?? null}
+          imageSrc={option.imageSrc}
           shortcut={`${i + 1}`}
           selected={selectedOption === option.id}
           onClick={() => onSelect(option.id)}
           status={status}
-          audioSrc={option.audioSrc ?? null}
+          audioSrc={option.audioSrc}
           disabled={disabled}
           type={type}
         />

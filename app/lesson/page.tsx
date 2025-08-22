@@ -1,41 +1,22 @@
 import { redirect } from "next/navigation";
 
-import { getLesson, getUserProgress, getUserSubscription } from "@/db/queries";
-
-import { Quiz } from "./quiz";
+import { getUserProgress } from "@/actions/user-progress";
+import { getCourseById } from "@/lib/data";
 
 const LessonPage = async () => {
-  const lessonData = getLesson();
-  const userProgressData = getUserProgress();
-  const userSubscriptionData = getUserSubscription();
+  const userProgress = await getUserProgress();
 
-  const [
-    lesson,
-    userProgress,
-    userSubscription,
-  ] = await Promise.all([
-    lessonData,
-    userProgressData,
-    userSubscriptionData,
-  ]);
-
-  if (!lesson || !userProgress) {
-    redirect("/learn");
+  if (!userProgress || !userProgress.activeCourseId) {
+    redirect("/courses");
   }
 
-  const initialPercentage = lesson.challenges
-    .filter((challenge) => challenge.completed)
-    .length / lesson.challenges.length * 100;
+  const course = getCourseById(userProgress.activeCourseId);
+  if (!course || !course.units.length || !course.units[0].lessons.length) {
+    redirect("/courses");
+  }
 
-  return ( 
-    <Quiz
-      initialLessonId={lesson.id}
-      initialLessonChallenges={lesson.challenges}
-      initialHearts={userProgress.hearts}
-      initialPercentage={initialPercentage}
-      userSubscription={userSubscription}
-    />
-  );
+  const firstLessonId = course.units[0].lessons[0].id;
+  redirect(`/lesson/${firstLessonId}`);
 };
- 
+
 export default LessonPage;

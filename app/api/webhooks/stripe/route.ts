@@ -1,11 +1,8 @@
 import Stripe from "stripe";
-import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-
-import db from "@/db/drizzle";
 import { stripe } from "@/lib/stripe";
-import { userSubscription } from "@/db/schema";
+import { setLocalStorage } from "@/lib/localStorage";
 
 export async function POST(req: Request) {
   const body = await req.text();

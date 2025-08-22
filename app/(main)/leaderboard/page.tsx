@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { FeedWrapper } from "@/components/feed-wrapper";
 import { UserProgress } from "@/components/user-progress";
 import { StickyWrapper } from "@/components/sticky-wrapper";
-import { getTopTenUsers, getUserProgress, getUserSubscription } from "@/db/queries";
+import { getUserProgress, getTopTenUsers } from "@/actions/user-progress";
+import { getUserSubscription } from "@/actions/user-subscription";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Promo } from "@/components/promo";
@@ -25,7 +26,7 @@ const LearderboardPage = async () => {
     leaderboardData,
   ]);
 
-  if (!userProgress || !userProgress.activeCourse) {
+  if (!userProgress || !userProgress.activeCourseId) {
     redirect("/courses");
   }
 
@@ -35,7 +36,12 @@ const LearderboardPage = async () => {
     <div className="flex flex-row-reverse gap-[48px] px-6">
       <StickyWrapper>
         <UserProgress
-          activeCourse={userProgress.activeCourse}
+          activeCourse={{
+            id: userProgress.activeCourseId,
+            title: "Spanish",
+            imageSrc: "/es.svg",
+            units: []
+          }}
           hearts={userProgress.hearts}
           points={userProgress.points}
           hasActiveSubscription={isPro}

@@ -4,21 +4,21 @@ import { toast } from "sonner";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { courses, userProgress } from "@/db/schema";
 import { upsertUserProgress } from "@/actions/user-progress";
+import { Course } from "./types";
 
 import { Card } from "./card";
 
 type Props = {
-  courses: typeof courses.$inferSelect[];
-  activeCourseId?: typeof userProgress.$inferSelect.activeCourseId;
+  courses: Course[];
+  activeCourseId?: string;
 };
 
 export const List = ({ courses, activeCourseId }: Props) => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
-  const onClick = (id: number) => {
+  const onClick = (id: string) => {
     if (pending) return;
 
     if (id === activeCourseId) {
@@ -26,7 +26,7 @@ export const List = ({ courses, activeCourseId }: Props) => {
     }
 
     startTransition(() => {
-      upsertUserProgress(id)  
+      upsertUserProgress(id)
         .catch(() => toast.error("Something went wrong."));
     });
   };

@@ -5,13 +5,12 @@ import { Quests } from "@/components/quests";
 import { FeedWrapper } from "@/components/feed-wrapper";
 import { UserProgress } from "@/components/user-progress";
 import { StickyWrapper } from "@/components/sticky-wrapper";
-import { getCourseById } from "@/lib/data";
+import { getCourseById, getChallengesForLesson } from "@/lib/data";
 import { getUserProgress } from "@/actions/user-progress";
 import { getUserSubscription } from "@/actions/user-subscription";
 
 import { Unit } from "./unit";
 import { Header } from "./header";
-import { Course, Unit as UnitType } from "./types";
 
 const LearnPage = async () => {
   const [userProgress, userSubscription] = await Promise.all([
@@ -32,18 +31,21 @@ const LearnPage = async () => {
   const units = course.units.map(unit => ({
     ...unit,
     lessons: unit.lessons.map(lesson => {
-      const completed = userProgress.completedLessons?.includes(lesson.id) ?? false;
+      const challenges = getChallengesForLesson(lesson.id);
+      const completed = challenges.filter(c => c.completed).length;
+      const percentage = challenges.length > 0 ? (completed / challenges.length) * 100 : 0;
       return {
         ...lesson,
-        completed,
-        percentage: completed ? 100 : 0,
+        completed: percentage === 100,
+        percentage,
       };
     }),
   }));
 
   // Calculate course progress
   const totalLessons = units.reduce((acc, unit) => acc + unit.lessons.length, 0);
-  const completedLessons = userProgress.completedLessons?.length ?? 0;
+  const completedLessons = units.reduce((acc, unit) => 
+    acc + unit.lessons.filter(lesson => lesson.completed).length, 0);
   const courseProgress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
 
   const isPro = !!userSubscription?.isActive;
@@ -58,7 +60,7 @@ const LearnPage = async () => {
           hasActiveSubscription={isPro}
         />
         <Promo />
-        <Quests points={userProgress.points || 0} />
+        <Quests />
       </StickyWrapper>
       <FeedWrapper>
         <Header title={course.title} />
@@ -74,14 +76,8 @@ const LearnPage = async () => {
                 description={unit.description}
                 lessons={unit.lessons}
                 order={unit.order}
-                activeLesson={unit.lessons.find(l => !l.completed) && {
-                  ...unit.lessons.find(l => !l.completed)!,
-                  unit: {
-                    ...unit,
-                    lessons: unit.lessons
-                  }
-                }}
-                activeLessonPercentage={0}
+                activeLesson={unit.lessons.find(l => l.percentage > 0 && l.percentage < 100)}
+                activeLessonPercentage={unit.lessons.find(l => l.percentage > 0 && l.percentage < 100)?.percentage || 0}
               />
             </div>
           ))}

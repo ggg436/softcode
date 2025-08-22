@@ -7,7 +7,8 @@ import { absoluteUrl } from "@/lib/utils";
 
 const returnUrl = absoluteUrl("/shop");
 
-import { getLocalStorage, setLocalStorage } from "@/lib/localStorage";
+// In-memory storage for user subscriptions
+let subscriptionStore: { [key: string]: any } = {};
 
 export const getUserSubscription = async () => {
   const { userId } = await auth();
@@ -16,7 +17,7 @@ export const getUserSubscription = async () => {
     throw new Error("Unauthorized");
   }
 
-  return getLocalStorage(`user-subscription-${userId}`, null);
+  return subscriptionStore[userId] || null;
 };
 
 export const createStripeUrl = async () => {

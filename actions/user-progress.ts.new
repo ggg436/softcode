@@ -6,10 +6,10 @@ import { auth, currentUser } from "@clerk/nextjs";
 
 import { getCourseById } from "@/lib/data";
 import { POINTS_TO_REFILL } from "@/constants";
-import { getLocalStorage, setLocalStorage } from "@/lib/localStorage";
 
-// Simple server-side in-memory store (dev/demo only)
-const userProgressServerStore: Record<string, any> = {};
+// In-memory storage for user progress
+// Note: In a production environment, you might want to use a more persistent solution
+let userProgressStore: { [key: string]: any } = {};
 
 export const getUserProgress = async () => {
   const { userId } = await auth();
@@ -18,12 +18,7 @@ export const getUserProgress = async () => {
     throw new Error("Unauthorized");
   }
 
-  // On the server, use the in-memory store
-  if (typeof window === "undefined") {
-    return userProgressServerStore[userId] || null;
-  }
-
-  return getLocalStorage(`user-progress-${userId}`, null);
+  return userProgressStore[userId] || null;
 };
 
 export const upsertUserProgress = async (courseId: string) => {
@@ -54,10 +49,7 @@ export const upsertUserProgress = async (courseId: string) => {
     streak: 0,
   };
 
-  // Persist on server for SSR flows
-  userProgressServerStore[userId] = newProgress;
-  // Also attempt to persist on client if available (no-op on server)
-  setLocalStorage(`user-progress-${userId}`, newProgress);
+  userProgressStore[userId] = newProgress;
 
   revalidatePath("/courses");
   revalidatePath("/learn");
@@ -81,10 +73,10 @@ export const reduceHearts = async () => {
     return false;
   }
 
-  setLocalStorage(`user-progress-${userId}`, {
+  userProgressStore[userId] = {
     ...currentUserProgress,
     hearts: currentUserProgress.hearts - 1,
-  });
+  };
 
   revalidatePath("/learn");
   revalidatePath("/learn/lesson");
@@ -109,11 +101,11 @@ export const refillHearts = async () => {
     throw new Error("Not enough points");
   }
 
-  setLocalStorage(`user-progress-${userId}`, {
+  userProgressStore[userId] = {
     ...currentUserProgress,
     hearts: 5,
     points: currentUserProgress.points - POINTS_TO_REFILL,
-  });
+  };
 
   revalidatePath("/learn");
   revalidatePath("/learn/lesson");
@@ -133,10 +125,10 @@ export const updatePoints = async (points: number) => {
     throw new Error("Progress not found");
   }
 
-  setLocalStorage(`user-progress-${userId}`, {
+  userProgressStore[userId] = {
     ...currentUserProgress,
     points,
-  });
+  };
 
   revalidatePath("/learn");
   revalidatePath("/learn/lesson");
@@ -157,32 +149,13 @@ export const updateStreak = async () => {
     throw new Error("Progress not found");
   }
 
-  setLocalStorage(`user-progress-${userId}`, {
+  userProgressStore[userId] = {
     ...currentUserProgress,
     streak: (currentUserProgress.streak || 0) + 1,
-  });
+  };
 
   revalidatePath("/learn");
   revalidatePath("/learn/lesson");
   revalidatePath("/shop");
   revalidatePath("/quests");
-};
-
-// Helper to get all user progress from localStorage (simulate for demo)
-function getAllUserProgressClient() {
-  if (typeof window === 'undefined') return [];
-  const keys = Object.keys(localStorage).filter(k => k.startsWith('user-progress-'));
-  return keys.map(k => JSON.parse(localStorage.getItem(k) || '{}'));
-}
-
-export const getTopTenUsers = async () => {
-  // Use server store when on server; otherwise use client localStorage as a fallback
-  const all = typeof window === 'undefined'
-    ? Object.values(userProgressServerStore)
-    : getAllUserProgressClient();
-
-  return all
-    .filter((u: any) => u && typeof u.points === 'number')
-    .sort((a: any, b: any) => b.points - a.points)
-    .slice(0, 10);
 };

@@ -1,19 +1,16 @@
-import { lessons, units } from "@/db/schema"
-
 import { UnitBanner } from "./unit-banner";
 import { LessonButton } from "./lesson-button";
+import { Lesson, Unit as UnitType } from "./types";
 
 type Props = {
-  id: number;
+  id: string;
   order: number;
   title: string;
-  description: string;
-  lessons: (typeof lessons.$inferSelect & {
-    completed: boolean;
-  })[];
-  activeLesson: typeof lessons.$inferSelect & {
-    unit: typeof units.$inferSelect;
-  } | undefined;
+  description?: string;
+  lessons: Lesson[];
+  activeLesson?: Lesson & {
+    unit: UnitType;
+  };
   activeLessonPercentage: number;
 };
 

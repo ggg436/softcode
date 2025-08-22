@@ -5,7 +5,8 @@ import { Promo } from "@/components/promo";
 import { FeedWrapper } from "@/components/feed-wrapper";
 import { UserProgress } from "@/components/user-progress";
 import { StickyWrapper } from "@/components/sticky-wrapper";
-import { getUserProgress, getUserSubscription } from "@/db/queries";
+import { getUserProgress } from "@/actions/user-progress";
+import { getUserSubscription } from "@/actions/user-subscription";
 
 import { Items } from "./items";
 import { Quests } from "@/components/quests";
@@ -22,7 +23,7 @@ const ShopPage = async () => {
     userSubscriptionData
   ]);
 
-  if (!userProgress || !userProgress.activeCourse) {
+  if (!userProgress || !userProgress.activeCourseId) {
     redirect("/courses");
   }
 
@@ -32,7 +33,12 @@ const ShopPage = async () => {
     <div className="flex flex-row-reverse gap-[48px] px-6">
       <StickyWrapper>
         <UserProgress
-          activeCourse={userProgress.activeCourse}
+          activeCourse={{
+            id: userProgress.activeCourseId,
+            title: "Spanish",
+            imageSrc: "/es.svg",
+            units: []
+          }}
           hearts={userProgress.hearts}
           points={userProgress.points}
           hasActiveSubscription={isPro}

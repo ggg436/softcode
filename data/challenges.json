@@ -1,0 +1,114 @@
+{
+  "challenges": [
+    {
+      "id": "challenge-planet",
+      "lessonId": "lesson-1",
+      "type": "SELECT",
+      "question": "Which planet is known as the Red Planet?",
+      "options": [
+        { "id": "option-planet-a", "text": "Venus", "correct": false },
+        { "id": "option-planet-b", "text": "Mars", "correct": true },
+        { "id": "option-planet-c", "text": "Jupiter", "correct": false }
+      ]
+    },
+    {
+      "id": "challenge-capital-japan",
+      "lessonId": "lesson-1",
+      "type": "SELECT",
+      "question": "What is the capital of Japan?",
+      "options": [
+        { "id": "option-japan-a", "text": "Tokyo", "correct": true },
+        { "id": "option-japan-b", "text": "Beijing", "correct": false },
+        { "id": "option-japan-c", "text": "Seoul", "correct": false }
+      ]
+    },
+    {
+      "id": "challenge-breathe-gas",
+      "lessonId": "lesson-1",
+      "type": "SELECT",
+      "question": "Which gas do humans need to breathe in order to survive?",
+      "options": [
+        { "id": "option-gas-a", "text": "Oxygen", "correct": true },
+        { "id": "option-gas-b", "text": "Carbon dioxide", "correct": false },
+        { "id": "option-gas-c", "text": "Nitrogen", "correct": false }
+      ]
+    },
+    {
+      "id": "challenge-largest-mammal",
+      "lessonId": "lesson-1",
+      "type": "SELECT",
+      "question": "Which animal is the largest mammal on Earth?",
+      "options": [
+        { "id": "option-mammal-a", "text": "Elephant", "correct": false },
+        { "id": "option-mammal-b", "text": "Blue Whale", "correct": true },
+        { "id": "option-mammal-c", "text": "Giraffe", "correct": false }
+      ]
+    },
+    {
+      "id": "challenge-telephone",
+      "lessonId": "lesson-1",
+      "type": "SELECT",
+      "question": "Who invented the telephone?",
+      "options": [
+        { "id": "option-phone-a", "text": "Thomas Edison", "correct": false },
+        { "id": "option-phone-b", "text": "Alexander Graham Bell", "correct": true },
+        { "id": "option-phone-c", "text": "Nikola Tesla", "correct": false }
+      ]
+    },
+    {
+      "id": "np-challenge-prime",
+      "lessonId": "np-lesson-1",
+      "type": "SELECT",
+      "question": "What is the smallest prime number?",
+      "options": [
+        { "id": "np-option-prime-a", "text": "1", "correct": false },
+        { "id": "np-option-prime-b", "text": "2", "correct": true },
+        { "id": "np-option-prime-c", "text": "3", "correct": false }
+      ]
+    },
+    {
+      "id": "np-challenge-ocean",
+      "lessonId": "np-lesson-1",
+      "type": "SELECT",
+      "question": "Which ocean is the largest in the world?",
+      "options": [
+        { "id": "np-option-ocean-a", "text": "Atlantic Ocean", "correct": false },
+        { "id": "np-option-ocean-b", "text": "Indian Ocean", "correct": false },
+        { "id": "np-option-ocean-c", "text": "Pacific Ocean", "correct": true }
+      ]
+    },
+    {
+      "id": "np-challenge-monalisa",
+      "lessonId": "np-lesson-1",
+      "type": "SELECT",
+      "question": "Who painted the Mona Lisa?",
+      "options": [
+        { "id": "np-option-art-a", "text": "Leonardo da Vinci", "correct": true },
+        { "id": "np-option-art-b", "text": "Pablo Picasso", "correct": false },
+        { "id": "np-option-art-c", "text": "Vincent van Gogh", "correct": false }
+      ]
+    },
+    {
+      "id": "np-challenge-rising-sun",
+      "lessonId": "np-lesson-1",
+      "type": "SELECT",
+      "question": "Which country is known as the Land of the Rising Sun?",
+      "options": [
+        { "id": "np-option-sun-a", "text": "China", "correct": false },
+        { "id": "np-option-sun-b", "text": "Japan", "correct": true },
+        { "id": "np-option-sun-c", "text": "Thailand", "correct": false }
+      ]
+    },
+    {
+      "id": "np-challenge-football",
+      "lessonId": "np-lesson-1",
+      "type": "SELECT",
+      "question": "How many players are there in a football (soccer) team on the field?",
+      "options": [
+        { "id": "np-option-football-a", "text": "9", "correct": false },
+        { "id": "np-option-football-b", "text": "11", "correct": true },
+        { "id": "np-option-football-c", "text": "13", "correct": false }
+      ]
+    }
+  ]
+}

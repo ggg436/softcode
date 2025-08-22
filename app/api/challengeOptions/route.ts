@@ -1,29 +1,16 @@
 import { NextResponse } from "next/server";
 
-import db from "@/db/drizzle";
-import { isAdmin } from "@/lib/admin";
-import { challengeOptions } from "@/db/schema";
+// TODO: Implement when database is set up
+// import db from "@/db/drizzle";
+// import { isAdmin } from "@/lib/admin";
+// import { challengeOptions } from "@/db/schema";
 
 export const GET = async () => {
-  if (!isAdmin()) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  const data = await db.query.challengeOptions.findMany();
-
-  return NextResponse.json(data);
+  // TODO: Implement when database is set up
+  return NextResponse.json({ message: "Not implemented yet" });
 };
 
 export const POST = async (req: Request) => {
-  if (!isAdmin()) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  const body = await req.json();
-
-  const data = await db.insert(challengeOptions).values({
-    ...body,
-  }).returning();
-
-  return NextResponse.json(data[0]);
+  // TODO: Implement when database is set up
+  return NextResponse.json({ message: "Not implemented yet" });
 };

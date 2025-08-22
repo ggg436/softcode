@@ -9,7 +9,6 @@ import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
 import { useHeartsModal } from "@/store/use-hearts-modal";
-import { challengeOptions, challenges, userSubscription } from "@/db/schema";
 import { usePracticeModal } from "@/store/use-practice-modal";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
 
@@ -18,16 +17,15 @@ import { Footer } from "./footer";
 import { Challenge } from "./challenge";
 import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
+import { LessonSidebar } from "./sidebar";
+import { Challenge as ChallengeType, Subscription } from "./types";
 
-type Props ={
+type Props = {
   initialPercentage: number;
   initialHearts: number;
-  initialLessonId: number;
-  initialLessonChallenges: (typeof challenges.$inferSelect & {
-    completed: boolean;
-    challengeOptions: typeof challengeOptions.$inferSelect[];
-  })[];
-  userSubscription: typeof userSubscription.$inferSelect & {
+  initialLessonId: string;
+  initialLessonChallenges: ChallengeType[];
+  userSubscription: Subscription & {
     isActive: boolean;
   } | null;
 };
@@ -76,7 +74,7 @@ export const Quiz = ({
     return uncompletedIndex === -1 ? 0 : uncompletedIndex;
   });
 
-  const [selectedOption, setSelectedOption] = useState<number>();
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
 
   const challenge = challenges[activeIndex];
@@ -86,25 +84,33 @@ export const Quiz = ({
     setActiveIndex((current) => current + 1);
   };
 
-  const onSelect = (id: number) => {
+  const onNavigateToQuestion = (index: number) => {
+    if (index >= 0 && index < challenges.length) {
+      setActiveIndex(index);
+      setStatus("none");
+      setSelectedOption(null);
+    }
+  };
+
+  const onSelect = (id: string) => {
     if (status !== "none") return;
 
     setSelectedOption(id);
   };
 
   const onContinue = () => {
-    if (!selectedOption) return;
+    if (selectedOption == null) return;
 
     if (status === "wrong") {
       setStatus("none");
-      setSelectedOption(undefined);
+      setSelectedOption(null);
       return;
     }
 
     if (status === "correct") {
       onNext();
       setStatus("none");
-      setSelectedOption(undefined);
+      setSelectedOption(null);
       return;
     }
 
@@ -136,7 +142,7 @@ export const Quiz = ({
       });
     } else {
       startTransition(() => {
-        reduceHearts(challenge.id)
+        reduceHearts()
           .then((response) => {
             if (response?.error === "hearts") {
               openHeartsModal();
@@ -200,6 +206,16 @@ export const Quiz = ({
           status="completed"
           onCheck={() => router.push("/learn")}
         />
+        
+        {/* Lesson Sidebar */}
+        <LessonSidebar
+          lessonId={lessonId}
+          currentQuestion={challenges.length}
+          totalQuestions={challenges.length}
+          percentage={100}
+          hearts={hearts}
+          onNavigateToQuestion={onNavigateToQuestion}
+        />
       </>
     );
   }
@@ -217,9 +233,9 @@ export const Quiz = ({
         percentage={percentage}
         hasActiveSubscription={!!userSubscription?.isActive}
       />
-      <div className="flex-1">
+      <div className="flex-1 pr-20">
         <div className="h-full flex items-center justify-center">
-          <div className="lg:min-h-[350px] lg:w-[600px] w-full px-6 lg:px-0 flex flex-col gap-y-12">
+          <div className="lg:minh-[350px] lg:w-[600px] w-full px-6 lg:px-0 flex flex-col gap-y-12">
             <h1 className="text-lg lg:text-3xl text-center lg:text-start font-bold text-neutral-700">
               {title}
             </h1>
@@ -233,16 +249,26 @@ export const Quiz = ({
                 status={status}
                 selectedOption={selectedOption}
                 disabled={pending}
-                type={challenge.type}
+                type={challenge.type as any}
               />
             </div>
           </div>
         </div>
       </div>
       <Footer
-        disabled={pending || !selectedOption}
+        disabled={pending || selectedOption == null}
         status={status}
         onCheck={onContinue}
+      />
+      
+      {/* Lesson Sidebar */}
+      <LessonSidebar
+        lessonId={lessonId}
+        currentQuestion={activeIndex + 1}
+        totalQuestions={challenges.length}
+        percentage={percentage}
+        hearts={hearts}
+        onNavigateToQuestion={onNavigateToQuestion}
       />
     </>
   );

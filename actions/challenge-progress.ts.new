@@ -3,7 +3,8 @@
 import { auth } from "@clerk/nextjs";
 import { revalidatePath } from "next/cache";
 
-import { getLocalStorage, setLocalStorage } from "@/lib/localStorage";
+// In-memory storage for challenge progress
+let challengeProgressStore: { [key: string]: any } = {};
 
 export const upsertChallengeProgress = async (challengeId: string, completed: boolean) => {
   const { userId } = await auth();
@@ -19,8 +20,8 @@ export const upsertChallengeProgress = async (challengeId: string, completed: bo
     createdAt: new Date().toISOString(),
   };
 
-  const key = `challenge-progress-${userId}-${challengeId}`;
-  setLocalStorage(key, progress);
+  const key = `${userId}-${challengeId}`;
+  challengeProgressStore[key] = progress;
 
   revalidatePath("/learn");
   revalidatePath("/learn/lesson");
@@ -37,5 +38,5 @@ export const getChallengeProgress = async (challengeId: string) => {
   }
 
   const key = `${userId}-${challengeId}`;
-  return getLocalStorage(key, null);
+  return challengeProgressStore[key] || null;
 };
