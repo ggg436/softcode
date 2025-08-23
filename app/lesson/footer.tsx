@@ -3,12 +3,14 @@ import { CheckCircle, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useLessonStep } from "@/components/challenges-sidebar";
 
 type Props = {
   onCheck: () => void;
   status: "correct" | "wrong" | "none" | "completed";
   disabled?: boolean;
   lessonId?: string;
+  onContinue?: () => void; // New prop for sidebar navigation
 };
 
 export const Footer = ({
@@ -16,9 +18,33 @@ export const Footer = ({
   status,
   disabled,
   lessonId,
+  onContinue,
 }: Props) => {
   useKey("Enter", onCheck, {}, [onCheck]);
   const isMobile = useMedia("(max-width: 1024px)");
+  const { currentLessonStep } = useLessonStep();
+
+  const handleContinue = () => {
+    if (status === "completed" && onContinue) {
+      onContinue(); // Use custom navigation for sidebar tabs
+    } else {
+      onCheck(); // Use default behavior for other statuses
+    }
+  };
+
+  // Determine button text based on lesson step
+  const getButtonText = () => {
+    if (status === "completed") {
+      if (currentLessonStep === "hi") {
+        return "Finish";
+      }
+      return "Continue";
+    }
+    if (status === "none") return "Check";
+    if (status === "correct") return "Next";
+    if (status === "wrong") return "Retry";
+    return "Continue";
+  };
 
   return (
     <footer className={cn(
@@ -39,26 +65,15 @@ export const Footer = ({
             Try again.
           </div>
         )}
-        {status === "completed" && (
-          <Button
-            variant="default"
-            size={isMobile ? "sm" : "lg"}
-            onClick={() => window.location.href = `/lesson/${lessonId}`}
-          >
-            Practice again
-          </Button>
-        )}
+        {/* Removed Practice Again button - only Continue/Finish button remains */}
         <Button
           disabled={disabled}
           className="ml-auto"
-          onClick={onCheck}
+          onClick={handleContinue}
           size={isMobile ? "sm" : "lg"}
           variant={status === "wrong" ? "danger" : "secondary"}
         >
-          {status === "none" && "Check"}
-          {status === "correct" && "Next"}
-          {status === "wrong" && "Retry"}
-          {status === "completed" && "Continue"}
+          {getButtonText()}
         </Button>
       </div>
     </footer>

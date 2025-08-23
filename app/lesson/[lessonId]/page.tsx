@@ -20,7 +20,13 @@ const LessonIdPage = async ({
   }
 
   return (
-    <Quiz />
+    <Quiz 
+      initialPercentage={0}
+      initialHearts={5}
+      initialLessonId={params.lessonId}
+      initialLessonChallenges={[]}
+      userSubscription={null}
+    />
   );
 };
 

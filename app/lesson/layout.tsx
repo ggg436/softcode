@@ -1,4 +1,4 @@
-import { ChallengesSidebar } from "@/components/challenges-sidebar";
+import { ChallengesSidebar, LessonStepProvider } from "@/components/challenges-sidebar";
 import { MobileHeader } from "@/components/mobile-header";
 
 type Props = {
@@ -6,14 +6,16 @@ type Props = {
 };
 
 const LessonLayout = ({ children }: Props) => {
-  return ( 
-    <div className="flex h-full">
-      <ChallengesSidebar />
-      <div className="flex flex-col h-full w-full lg:ml-[256px]">
-        <MobileHeader />
-        {children}
+  return (
+    <LessonStepProvider>
+      <div className="flex h-full">
+        <ChallengesSidebar />
+        <div className="flex flex-col h-full w-full lg:ml-[256px]">
+          <MobileHeader />
+          {children}
+        </div>
       </div>
-    </div>
+    </LessonStepProvider>
   );
 };
  

@@ -142,6 +142,56 @@ export const LessonSidebar = ({
                 Review
               </Button>
             </div>
+
+            {/* HTML Course Navigation */}
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                HTML Course Sections
+              </h4>
+              <div className="space-y-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => window.location.href = `/lesson/${lessonId}/html-introduction`}
+                >
+                  HTML Introduction
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => window.location.href = `/lesson/${lessonId}/html-element`}
+                >
+                  HTML Element
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => window.location.href = `/lesson/${lessonId}/web-browsers`}
+                >
+                  Web Browsers
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => window.location.href = `/lesson/${lessonId}/html-page-structure`}
+                >
+                  HTML Page Structure
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={() => window.location.href = `/lesson/${lessonId}/html-history`}
+                >
+                  HTML History
+                </Button>
+              </div>
+            </div>
           </div>
         ) : (
           /* Collapsed State Icons */
