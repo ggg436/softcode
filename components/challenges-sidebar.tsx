@@ -8,14 +8,13 @@ import {
 import { Loader } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
-import { SidebarItem } from "./sidebar-item";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   className?: string;
 };
 
-export const Sidebar = ({ className }: Props) => {
+export const ChallengesSidebar = ({ className }: Props) => {
   return (
     <div className={cn(
       "flex h-full lg:w-[256px] lg:fixed left-0 top-0 px-4 border-r-2 flex-col",
@@ -30,31 +29,12 @@ export const Sidebar = ({ className }: Props) => {
         </div>
       </Link>
       <div className="flex flex-col gap-y-2 flex-1">
-        <SidebarItem 
-          label="Learn" 
-          href="/learn"
-          iconSrc="/learn.svg"
-        />
-        <SidebarItem 
-          label="Leaderboard" 
-          href="/leaderboard"
-          iconSrc="/leaderboard.svg"
-        />
-        <SidebarItem 
-          label="quests" 
-          href="/quests"
-          iconSrc="/quests.svg"
-        />
-        <SidebarItem 
-          label="shop" 
-          href="/shop"
-          iconSrc="/shop.svg"
-        />
-        <SidebarItem 
-          label="quizes" 
-          href="/quizes"
-          iconSrc="/quests.svg"
-        />
+        <Button
+          variant="sidebarOutline"
+          className="w-full justify-start"
+        >
+          HTML Introduction
+        </Button>
       </div>
       <div className="p-4">
         <ClerkLoading>

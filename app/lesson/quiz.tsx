@@ -1,265 +1,51 @@
 "use client";
 
-import { toast } from "sonner";
-import Image from "next/image";
-import Confetti from "react-confetti";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { useAudio, useWindowSize, useMount } from "react-use";
-
-import { reduceHearts } from "@/actions/user-progress";
-import { useHeartsModal } from "@/store/use-hearts-modal";
-import { usePracticeModal } from "@/store/use-practice-modal";
-import { upsertChallengeProgress } from "@/actions/challenge-progress";
-
-import { Header } from "./header";
-import { Footer } from "./footer";
-import { Challenge } from "./challenge";
-import { ResultCard } from "./result-card";
-import { QuestionBubble } from "./question-bubble";
-import { ChallengeSidebar } from "./challenge-sidebar";
-import { Challenge as ChallengeType, Subscription } from "./types";
-
-type Props = {
-  initialPercentage: number;
-  initialHearts: number;
-  initialLessonId: string;
-  initialLessonChallenges: ChallengeType[];
-  userSubscription: Subscription & {
-    isActive: boolean;
-  } | null;
-};
-
-export const Quiz = ({
-  initialPercentage,
-  initialHearts,
-  initialLessonId,
-  initialLessonChallenges,
-  userSubscription,
-}: Props) => {
-  const { open: openHeartsModal } = useHeartsModal();
-  const { open: openPracticeModal } = usePracticeModal();
-
-  useMount(() => {
-    if (initialPercentage === 100) {
-      openPracticeModal();
-    }
-  });
-
-  const { width, height } = useWindowSize();
-
-  const router = useRouter();
-
-  const [finishAudio] = useAudio({ src: "/finish.mp3", autoPlay: true });
-  const [
-    correctAudio,
-    _c,
-    correctControls,
-  ] = useAudio({ src: "/correct.wav" });
-  const [
-    incorrectAudio,
-    _i,
-    incorrectControls,
-  ] = useAudio({ src: "/incorrect.wav" });
-  const [pending, startTransition] = useTransition();
-
-  const [lessonId] = useState(initialLessonId);
-  const [hearts, setHearts] = useState(initialHearts);
-  const [percentage, setPercentage] = useState(() => {
-    return initialPercentage === 100 ? 0 : initialPercentage;
-  });
-  const [challenges] = useState(initialLessonChallenges);
-  const [activeIndex, setActiveIndex] = useState(() => {
-    const uncompletedIndex = challenges.findIndex((challenge) => !challenge.completed);
-    return uncompletedIndex === -1 ? 0 : uncompletedIndex;
-  });
-
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
-
-  const challenge = challenges[activeIndex];
-  const options = challenge?.challengeOptions ?? [];
-
-  const onNext = () => {
-    setActiveIndex((current) => current + 1);
-  };
-
-  const onNavigateToQuestion = (index: number) => {
-    if (index >= 0 && index < challenges.length) {
-      setActiveIndex(index);
-      setStatus("none");
-      setSelectedOption(null);
-    }
-  };
-
-  const onSelect = (id: string) => {
-    if (status !== "none") return;
-
-    setSelectedOption(id);
-  };
-
-  const onContinue = () => {
-    if (selectedOption == null) return;
-
-    if (status === "wrong") {
-      setStatus("none");
-      setSelectedOption(null);
-      return;
-    }
-
-    if (status === "correct") {
-      onNext();
-      setStatus("none");
-      setSelectedOption(null);
-      return;
-    }
-
-    const correctOption = options.find((option) => option.correct);
-
-    if (!correctOption) {
-      return;
-    }
-
-    if (correctOption.id === selectedOption) {
-      startTransition(() => {
-        upsertChallengeProgress(challenge.id, true)
-          .then(() => {
-            correctControls.play();
-            setStatus("correct");
-            setPercentage((prev) => prev + 100 / challenges.length);
-
-            // This is a practice
-            if (initialPercentage === 100) {
-              setHearts((prev) => Math.min(prev + 1, 5));
-            }
-          })
-          .catch(() => toast.error("Something went wrong. Please try again."))
-      });
-    } else {
-      startTransition(() => {
-        reduceHearts()
-          .then((response) => {
-            incorrectControls.play();
-            setStatus("wrong");
-
-            if (response === false) {
-              setHearts((prev) => Math.max(prev - 1, 0));
-            }
-          })
-          .catch(() => toast.error("Something went wrong. Please try again."))
-      });
-    }
-  };
-
-  if (!challenge) {
-    return (
-      <>
-        {finishAudio}
-        <Confetti
-          width={width}
-          height={height}
-          recycle={false}
-          numberOfPieces={500}
-          tweenDuration={10000}
-        />
-        <div className="flex flex-col gap-y-4 lg:gap-y-8 max-w-lg mx-auto text-center items-center justify-center h-full">
-          <Image
-            src="/finish.svg"
-            alt="Finish"
-            className="hidden lg:block"
-            height={100}
-            width={100}
-          />
-          <Image
-            src="/finish.svg"
-            alt="Finish"
-            className="block lg:hidden"
-            height={50}
-            width={50}
-          />
-          <h1 className="text-xl lg:text-3xl font-bold text-neutral-700">
-            Great job! <br /> You&apos;ve completed the lesson.
-          </h1>
-          <div className="flex items-center gap-x-4 w-full">
-            <ResultCard
-              variant="points"
-              value={challenges.length * 10}
-            />
-            <ResultCard
-              variant="hearts"
-              value={hearts}
-            />
-          </div>
-        </div>
-        <Footer
-          lessonId={lessonId}
-          status="completed"
-          onCheck={() => router.push("/learn")}
-        />
-        
-        {/* Challenge Sidebar */}
-        <ChallengeSidebar
-          lessonId={lessonId}
-          currentQuestion={challenges.length}
-          totalQuestions={challenges.length}
-          percentage={100}
-          hearts={hearts}
-          onNavigateToQuestion={onNavigateToQuestion}
-        />
-      </>
-    );
-  }
-
-  const title = challenge.type === "ASSIST" 
-    ? "Select the correct meaning"
-    : challenge.question;
-
+export const Quiz = () => {
   return (
-    <>
-      {incorrectAudio}
-      {correctAudio}
-      <Header
-        hearts={hearts}
-        percentage={percentage}
-        hasActiveSubscription={!!userSubscription?.isActive}
-      />
-      <div className="flex-1 pr-20">
-        <div className="h-full flex items-center justify-center">
-          <div className="lg:minh-[350px] lg:w-[600px] w-full px-6 lg:px-0 flex flex-col gap-y-12">
-            <h1 className="text-lg lg:text-3xl text-center lg:text-start font-bold text-neutral-700">
-              {title}
+    <div className="flex-1">
+      <div className="h-full flex items-center justify-center">
+        <div className="lg:min-h-[350px] lg:w-[600px] w-full px-6 lg:px-0 flex flex-col gap-y-8">
+          <div className="text-center">
+            <h1 className="text-2xl lg:text-4xl font-bold text-neutral-700 mb-4">
+              HTML Introduction
             </h1>
-            <div>
-              {challenge.type === "ASSIST" && (
-                <QuestionBubble question={challenge.question} />
-              )}
-              <Challenge
-                options={options}
-                onSelect={onSelect}
-                status={status}
-                selectedOption={selectedOption}
-                disabled={pending}
-                type={challenge.type as any}
-              />
+            <p className="text-lg text-neutral-600 mb-8">
+              Learn the basics of HTML markup language
+            </p>
+          </div>
+          <div className="bg-white rounded-xl border-2 border-b-4 border-gray-200 p-6 text-center">
+            <h2 className="text-xl font-semibold text-neutral-700 mb-4">
+              Welcome to HTML Basics!
+            </h2>
+            <p className="text-neutral-600 mb-6">
+              This course will teach you the fundamentals of HTML, including:
+            </p>
+            <div className="space-y-3 text-left max-w-md mx-auto">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-neutral-700">HTML document structure</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-neutral-700">Common HTML tags</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-neutral-700">Text formatting</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-neutral-700">Links and images</span>
+              </div>
+            </div>
+            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+              <p className="text-blue-800 font-medium">
+                🚧 Course content coming soon!
+              </p>
             </div>
           </div>
         </div>
       </div>
-      <Footer
-        disabled={pending || selectedOption == null}
-        status={status}
-        onCheck={onContinue}
-      />
-      
-      {/* Challenge Sidebar */}
-      <ChallengeSidebar
-        lessonId={lessonId}
-        currentQuestion={activeIndex + 1}
-        totalQuestions={challenges.length}
-        percentage={percentage}
-        hearts={hearts}
-        onNavigateToQuestion={onNavigateToQuestion}
-      />
-    </>
+    </div>
   );
 };

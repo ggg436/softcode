@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getChallengesForLesson } from "@/lib/data";
 import { getUserProgress } from "@/actions/user-progress";
-import { getUserSubscription } from "@/actions/user-subscription";
 
 import { Quiz } from "../quiz";
 
@@ -15,30 +13,15 @@ type Props = {
 const LessonIdPage = async ({
   params,
 }: Props) => {
-  const [
-    userProgress,
-    userSubscription,
-  ] = await Promise.all([
-    getUserProgress(),
-    getUserSubscription(),
-  ]);
+  const userProgress = await getUserProgress();
 
-  const challenges = getChallengesForLesson(params.lessonId);
-
-  if (!challenges || !userProgress) {
+  if (!userProgress) {
     redirect("/learn");
   }
 
-  const completedChallenges = challenges.filter((challenge) => challenge.completed);
-  const initialPercentage = completedChallenges.length / challenges.length * 100;
-
   return (
-    <Quiz
-      initialLessonId={params.lessonId}
-      initialLessonChallenges={challenges}
-      initialHearts={userProgress.hearts}
-      initialPercentage={initialPercentage}
-      userSubscription={userSubscription || { isActive: false }}
-    />
+    <Quiz />
   );
-};export default LessonIdPage;
+};
+
+export default LessonIdPage;
